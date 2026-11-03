@@ -1,0 +1,382 @@
+<meta charset="utf-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Candle Production Pitch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root { --bg: #ffffff; --surface: #eceff8; --text: #323338; --muted: #676879; --accent: #0073ea; --warm: #ffcc00; --border: rgba(0, 0, 0, 0.1); --dot: #c4c4c4; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-bottom: 24px; }
+  h1, h2, h3, strong, b { font-weight: 600; }
+  .display { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  .stage { position: relative; aspect-ratio: 16 / 9; container-type: inline-size; overflow: hidden; border-radius: 24px; background: var(--bg); border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08); }
+  .card { border-radius: max(12px, 2.4cqi); border: 1px solid var(--border); background: var(--surface); padding: max(10px, 2.2cqi); min-width: 0; }
+  .split { display: grid; grid-template-columns: 1fr 1.1fr; gap: max(12px, 3cqi); align-items: center; flex: 1; min-height: 0; }
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: max(10px, 3cqi); }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: max(8px, 2cqi); }
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: max(8px, 1.2cqi); }
+  .flow > .card { flex: 1 1 150px; }
+  .arr { display: flex; align-items: center; color: var(--muted); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 12px; padding: 8px 14px; font: 600 13px 'Inter', system-ui, sans-serif; cursor: pointer; }
+  .btn:focus-visible, .dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dot { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; padding: 0; background: transparent; cursor: pointer; }
+  .dot::before { content: ""; width: 8px; height: 8px; border-radius: 9999px; background: var(--dot); }
+  .dot[aria-current="true"]::before { background: var(--accent); width: 22px; }
+  .slide { position: absolute; inset: 0; padding: max(14px, 3cqi); display: flex; flex-direction: column; gap: max(8px, 2cqi); }
+  @media (max-width: 640px) {
+    .stage { aspect-ratio: auto; }
+    .slide { position: relative; min-height: 620px; }
+    .split, .row3 { grid-template-columns: 1fr; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .flow .arr { display: none; }
+    .btn .lbl { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { ink: 'var(--text)', char: '#262A44', monday: 'var(--accent)', amber: 'var(--accent)', cream: 'var(--text)' } } } };
+</script>
+<script>
+const { useState, useEffect } = React;
+const h = React.createElement;
+
+const f = (min, c) => 'max(' + min + 'px, ' + c + 'cqi)';
+
+function Icon({ name, size = 20, color }) {
+  const ref = React.useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.innerHTML = '<i data-lucide="' + name + '"></i>';
+    if (window.lucide) window.lucide.createIcons({ attrs: { width: size, height: size, 'stroke-width': 1.75 } });
+  }, [name, size]);
+  return h('span', { ref, 'aria-hidden': 'true', style: { display: 'inline-flex', color: color || 'inherit', flex: 'none' } });
+}
+
+function Head(eyebrow, title, sub) {
+  return h('div', { style: { display: 'grid', gap: f(6, 1.2) } },
+    h('p', { style: { margin: 0, fontSize: f(12, 1.7), letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--accent)', fontWeight: 600 } }, eyebrow),
+    h('h2', { className: 'display', style: { margin: 0, fontSize: f(22, 4.2), lineHeight: 1.12, textWrap: 'balance' } }, title),
+    sub ? h('p', { style: { margin: 0, fontSize: f(13, 2), color: 'var(--muted)', maxWidth: '60ch' } }, sub) : null
+  );
+}
+
+function Points(items) {
+  return h('ul', { style: { listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: f(6, 1.6) } },
+    ...items.map((it, k) => h('li', { key: k, style: { display: 'flex', gap: f(8, 1.8), fontSize: f(12, 1.8), lineHeight: 1.5, color: 'var(--text)' } },
+      h('span', { style: { marginTop: f(5, 1), width: f(6, 1), height: f(6, 1), borderRadius: 9999, background: 'var(--warm)', flex: 'none' } }),
+      h('span', null, h('strong', { style: { color: 'var(--text)' } }, it[0]), ' ' + it[1])
+    ))
+  );
+}
+
+function Footer(n, total) {
+  return h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: f(12, 1.4), color: 'var(--muted)' } },
+    h('span', null, 'monday.com · Candle Gift Box Production Builder'),
+    h('span', null, n + ' / ' + total)
+  );
+}
+
+function Slide(n, head, body) {
+  return h('div', { className: 'slide' },
+    head, body, Footer(n, SLIDES.length)
+  );
+}
+
+function S1(n) {
+  return Slide(n, null,
+    h('div', { style: { position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: f(10, 2.4) } },
+            h(Icon, { name: 'flame', size: 44, color: 'var(--accent)' }),
+      h('p', { style: { margin: 0, fontSize: f(12, 1.7), letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--accent)', fontWeight: 600 } }, 'monday.com · Enterprise gifting'),
+      h('h1', { className: 'display', style: { margin: 0, fontSize: f(30, 6.4), lineHeight: 1.1, textWrap: 'balance', maxWidth: '18ch' } }, 'From Craft to Scale: Artisanal Corporate Gifting on monday.com'),
+      h('p', { style: { margin: 0, fontSize: f(13, 2.2), color: 'var(--muted)', maxWidth: '52ch' } }, 'How modern enterprise gift box production moves at the speed of business.'),
+      h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: f(6, 1.2), marginTop: f(6, 1.5) } },
+        ...['Exactly 3 scents per box', 'Built inside monday.com', 'Made to order'].map(t =>
+          h('span', { key: t, style: { fontSize: f(12, 1.8), color: 'var(--text)' } }, t))
+      )
+    )
+  );
+}
+
+function S2(n) {
+  const row = (icon, label) => h('div', { style: { display: 'flex', alignItems: 'center', gap: f(8, 1.8), fontSize: f(12, 1.7), color: 'var(--text)' } },
+    h(Icon, { name: icon, size: 18, color: 'var(--accent)' }), h('span', null, label));
+  const card = (title, accent, items) => h('div', { className: 'card', style: { borderTop: '3px solid ' + accent, padding: 'max(8px, 1.8cqi)' } },
+    h('p', { style: { margin: '0 0 ' + f(8, 1.4), fontSize: f(12, 1.7), fontWeight: 600, color: 'var(--text)' } }, title),
+    h('div', { style: { display: 'grid', gap: f(4, 1) } }, ...items.map(([i, l]) => row(i, l))));
+  return Slide(n, Head('The problem','Clients expect instant turnaround. Production runs on paper.'),
+    h('div', { className: 'split' },
+      Points([
+        ['Double entry:', 'orders are written on paper, then retyped for production.'],
+        ['Lost detail:', 'inscriptions and scent choices get transcribed by hand.'],
+        ['No visibility:', 'sales and floor managers cannot see where an order stands.']
+      ]),
+      h('div', { style: { display: 'grid', gap: f(8, 1.4) } },
+        card('The manual friction', 'var(--accent)', [['phone', 'Phone orders'], ['sticky-note', 'Paper notes'], ['file-spreadsheet', 'Disconnected spreadsheets']]),
+        card('Client expectations', 'var(--accent)', [['clock', 'Instant turnaround'], ['eye', 'Live order status'], ['zap', 'No re-typing']])
+      )
+    )
+  );
+}
+
+function S3(n) {
+  const pillar = (icon, title, text) => h('div', { className: 'card', style: { display: 'grid', gap: f(8, 2), alignContent: 'start' } },
+    h(Icon, { name: icon, size: 30, color: 'var(--accent)' }),
+    h('h3', { className: 'display', style: { margin: 0, fontSize: f(15, 2.6), lineHeight: 1.2 } }, title),
+    h('p', { style: { margin: 0, fontSize: f(12, 1.7), lineHeight: 1.5, color: 'var(--muted)' } }, text));
+  return Slide(n, Head('Solution: the rules','Three non-negotiables shape every box', 'Generic carts cannot enforce these rules. This app does.'),
+    h('div', { className: 'row3', style: { flex: 1, alignItems: 'center' } },
+      pillar('layers', 'Exactly 3 scents', 'Each box holds three different fragrances. Two, four or a repeat is rejected before anything is produced.'),
+      pillar('package-open', 'Made to order', 'No pooled batches and no stock on shelves. Every order is produced on its own.'),
+      pillar('pen-line', 'Personal inscriptions', 'Every box can carry a bespoke message of up to 80 characters.')
+    )
+  );
+}
+
+function S4(n) {
+  const node = (icon, label, sub, accent) => h('div', { className: 'card', style: { display: 'grid', gap: f(6, 1.1), justifyItems: 'start', alignContent: 'start', borderColor: accent } },
+    h(Icon, { name: icon, size: 26, color: accent }),
+    h('strong', { style: { fontSize: f(13, 2), color: 'var(--text)' } }, label),
+    h('span', { style: { fontSize: f(12, 1.6), color: 'var(--muted)' } }, sub));
+  const arr = () => h('div', { className: 'arr' }, h(Icon, { name: 'arrow-right', size: 20 }));
+  return Slide(n, Head('Solution: how it works','One workspace from client request to production'),
+    h('div', { style: { display: 'grid', gap: f(10, 2.4) } },
+      h('div', { className: 'flow' },
+        node('phone', 'Client request', 'Designer takes the call', 'var(--muted)'), arr(),
+        node('layout-dashboard', 'Order Maker', 'Board view, validated', 'var(--accent)'), arr(),
+        node('workflow', 'Production board', 'Request, Working On It, Done', 'var(--accent)'), arr(),
+        node('flame', 'Candles made', 'Each box produced on its own', 'var(--accent)')
+      ),
+      Points([
+        ['Native:', 'runs inside monday.com Work Management, with nothing extra to install.'],
+        ['Validated:', 'the 3-scent rule is checked before anything is written.'],
+        ['Connected:', 'each order lands on the production board the moment it is submitted.']
+      ])
+    )
+  );
+}
+
+function S5(n) {
+  const field = (label, val) => h('div', { style: { display: 'grid', gap: f(4, .6), minWidth: 0 } },
+    h('span', { style: { fontSize: f(12, 1.3), color: 'var(--muted)' } }, label),
+    h('span', { style: { border: '1px solid var(--border)', borderRadius: 8, padding: f(4, .7), fontSize: f(12, 1.6), background: 'var(--bg)', color: 'var(--text)' } }, val));
+  const chip = (t) => h('span', { key: t, style: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 9999, background: 'rgba(0,115,234,.2)', border: '1px solid rgba(0,115,234,.55)', fontSize: f(12, 1.5), color: 'var(--text)' } }, t, h(Icon, { name: 'x', size: 12 }));
+  const callout = (num, text) => h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: f(12, 1.5), color: 'var(--text)' } },
+    h('span', { style: { width: 20, height: 20, borderRadius: 9999, background: 'var(--warm)', color: 'var(--text)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, flex: 'none' } }, num), h('span', null, text));
+  const mock = h('div', { className: 'card', style: { display: 'grid', gap: f(6, .8), padding: f(10, 1.2), background: 'var(--surface)' } },
+    h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+      h('strong', { style: { fontSize: f(12, 1.7), color: 'var(--text)' } }, 'Order Maker'),
+      h('span', { style: { fontSize: f(12, 1.5), color: 'var(--muted)' } }, 'Board view')),
+    h('div', { style: { display: 'grid', gridTemplateColumns: '2fr 2fr 1fr', gap: f(6, 1.2) } },
+      field('First name', 'Dana'), field('Last name', 'Reyes'), field('Quantity', '2')),
+    h('div', { style: { display: 'grid', gap: f(4, .6) } },
+      h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 6 } }, ...['Campfire', 'Cedar', 'Herb'].map(chip)),
+      h('span', { style: { fontSize: f(12, 1.5), color: 'var(--accent)' } }, '3 of 3 chosen')),
+    field('Inscription (optional)', 'For Dana, with thanks'),
+    h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'nowrap' } },
+      h('span', { style: { fontSize: f(12, 1.5), color: 'var(--muted)' } }, '21/80 characters · 6 candles'),
+      h('span', { style: { background: 'var(--accent)', color: '#ffffff', padding: f(4, .6) + ' ' + f(10, 1.6), borderRadius: 8, fontWeight: 600, fontSize: f(12, 1.6) } }, 'Start Order')));
+  return Slide(n, Head('Solution: the Order Maker','Assemble an order in seconds, inside monday.com'),
+    h('div', { className: 'split' },
+      h('div', { style: { display: 'grid', gap: f(12, 2.2), alignContent: 'center' } },
+        Points([
+          ['Locked at three:', 'once three scents are chosen, the menu offers only those.'],
+          ['Instant search:', 'type a scent name. Six families, Citrus to Smokey.'],
+          ['Familiar look:', 'built on monday’s Vibe design system.']
+        ]),
+        h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: f(12, 2) } },
+          callout('1', 'Locked at three'), callout('2', 'Live counter'), callout('3', 'One click to send'))),
+      mock
+    )
+  );
+}
+
+function S6(n) {
+  const tier = (icon, title, sub, accent) => h('div', { className: 'card', style: { width: '100%', display: 'flex', gap: f(12, 2.2), alignItems: 'center' } },
+    h(Icon, { name: icon, size: 28, color: accent }),
+    h('div', { style: { display: 'grid', gap: f(4, .6), minWidth: 0 } },
+      h('strong', { style: { fontSize: f(13, 2), color: 'var(--text)' } }, title),
+      h('span', { style: { fontSize: f(12, 1.6), color: 'var(--muted)' } }, sub)));
+  const down = () => h('div', { style: { color: 'var(--muted)', display: 'flex' } }, h(Icon, { name: 'arrow-down', size: 18 }));
+  return Slide(n, Head('Trust and security','Hosted on monday-code, with no external cloud'),
+    h('div', { className: 'split' },
+      Points([
+        ['No external cloud:', 'the app runs on monday-code. No AWS, GCP or Azure.'],
+        ['Identity on every request:', 'each call is checked against the caller’s short-lived monday session.'],
+        ['Rules on the server:', 'the server re-checks each order before it is written to the board.']
+      ]),
+      h('div', { style: { display: 'grid', gap: f(4, .8), justifyItems: 'center' } },
+        tier('layout-dashboard', 'monday Board context', 'The Order view opens inside the board', 'var(--accent)'), down(),
+        tier('monitor', 'React frontend on Vibe', 'Order Maker and the fragrance library', 'var(--accent)'), down(),
+        tier('server', 'monday-code backend', 'REST API, rules and order writes, with the library in monday’s Document DB', 'var(--accent)'))
+    )
+  );
+}
+
+function S7(n) {
+  const stage = (pill, color, icon, lines) => h('div', { className: 'card', style: { display: 'grid', gap: f(8, 1.4), alignContent: 'start' } },
+    h('span', { style: { justifySelf: 'start', whiteSpace: 'nowrap', padding: f(4, .8) + ' ' + f(12, 1.6), borderRadius: 9999, background: color, color: 'var(--text)', fontWeight: 600, fontSize: f(12, 1.6) } }, pill),
+    h(Icon, { name: icon, size: 28, color }),
+    h('ul', { style: { listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: f(6, 1.2) } },
+      ...lines.map((l, k) => h('li', { key: k, style: { fontSize: f(12, 1.7), lineHeight: 1.5, color: 'var(--text)' } }, l))));
+  return Slide(n, Head('Automated handoff', 'From request to done, without the back-and-forth'),
+    h('div', { className: 'split' },
+      Points([
+        ['Automatic moves:', 'a status change moves the item and starts or stops the timer.'],
+        ['Notified at once:', 'each new order sends a notification to its owner.'],
+        ['One source of truth:', 'the board shows every order’s stage to everyone.']
+      ]),
+      h('div', { className: 'row3' },
+        stage('Request', '#66CCFF', 'bell', ['New order created', 'Notification sent']),
+        stage('Working On It', '#FDAB3D', 'timer', ['Item moves to Working On It', 'Time tracking starts']),
+        stage('Done', '#00C875', 'circle-check', ['Item moves to Done', 'Timer stops; complete date set']))
+    )
+  );
+}
+
+function S8(n) {
+  const kpi = (label, val) => h('div', { className: 'card', style: { display: 'grid', gap: f(4, .6), padding: 'max(8px, 1.6cqi)' } },
+    h('span', { style: { fontSize: f(12, 1.5), color: 'var(--muted)' } }, label),
+    h('strong', { className: 'display', style: { fontSize: f(16, 3), color: 'var(--text)' } }, val));
+  const bars = [['Request', 4, '#66CCFF'], ['Working On It', 2, '#FDAB3D'], ['Done', 3, '#00C875']];
+  return Slide(n, Head('Visibility and SLA', 'Turnaround and pipeline on one executive dashboard'),
+    h('div', { className: 'split' },
+      Points([
+        ['Cycle time:', 'Done minus Working On It, measured by the board’s timer.'],
+        ['Pipeline at a glance:', 'orders by status, updated as the floor moves them.'],
+        ['Turnaround per order:', 'days from received to complete, on every item.']
+      ]),
+      h('div', { style: { display: 'grid', gap: f(12, 2.2) } },
+        h('div', { className: 'kpis' },
+          kpi('Open', '4'), kpi('Producing', '2'), kpi('Done', '3'), kpi('Avg days', '2.4')),
+        h('div', { className: 'card', style: { display: 'grid', gap: f(6, 1.1), padding: 'max(8px, 1.6cqi)' } },
+          h('span', { style: { fontSize: f(12, 1.6), color: 'var(--muted)' } }, 'Orders by status · sample data'),
+          ...bars.map(([lab, v, c]) => h('div', { key: lab, style: { display: 'grid', gridTemplateColumns: 'minmax(104px,1.4fr) 3fr 20px', alignItems: 'center', gap: f(8, 1.5), fontSize: f(12, 1.6) } },
+            h('span', { style: { color: 'var(--text)' } }, lab),
+            h('div', { style: { height: f(12, 1.8), background: 'var(--border)', borderRadius: 9999, overflow: 'hidden' } },
+              h('div', { style: { height: '100%', width: (v / 4 * 100) + '%', background: c, borderRadius: 9999 } })),
+            h('span', { style: { textAlign: 'right', color: 'var(--text)' } }, String(v)))))
+      )
+    )
+  );
+}
+
+function S9(n) {
+  const stat = (num, label, note, accent) => h('div', { className: 'card', style: { display: 'grid', gap: f(12, 2), alignContent: 'start' } },
+    h('strong', { className: 'display', style: { fontSize: f(34, 7.5), color: accent, lineHeight: 1 } }, num),
+    h('p', { style: { margin: 0, fontSize: f(13, 2), lineHeight: 1.5, color: 'var(--text)' } }, label),
+    h('p', { style: { margin: 0, fontSize: f(12, 1.6), color: 'var(--muted)' } }, note));
+  return Slide(n, Head('Proof of progress','What is proven today, and what the pilot will measure'),
+    h('div', { className: 'row3', style: { flex: 1, alignItems: 'center' } },
+      stat('207', 'Automated tests covering order rules, access and catalogue changes', 'Passing on the current build', 'var(--accent)'),
+      stat('0', 'Retyping steps: the order goes straight from the form to the board', 'Confirmed on live orders', '#00C875'),
+      stat('[X]%', 'Reduction in order-to-production cycle time', 'Not yet measured. Set your baseline together in the pilot.', 'var(--accent)'))
+  );
+}
+
+function S10(n) {
+  return Slide(n, Head('Next steps', 'One workspace for designers, makers and leadership'),
+    h('div', { className: 'split' },
+      Points([
+        ['Week 1, setup:', 'load your fragrance catalogue and categories once.'],
+        ['Weeks 2 and 3, pilot:', 'one designer team takes live orders.'],
+        ['Week 4, review:', 'compare cycle time and order accuracy with your baseline.']
+      ]),
+      h('div', { className: 'card', style: { display: 'grid', gap: f(10, 2), justifyItems: 'start', padding: f(14, 3.2) } },
+        h(Icon, { name: 'rocket', size: 34, color: 'var(--accent)' }),
+        h('strong', { className: 'display', style: { fontSize: f(20, 3.8), color: 'var(--text)' } }, 'Ready for a pilot?'),
+        h('p', { style: { margin: 0, fontSize: f(12, 1.7), color: 'var(--muted)', lineHeight: 1.5 } }, 'Two weeks, one designer team, and one catalogue.'),
+        h('p', { style: { margin: 0, fontSize: f(12, 1.7), color: 'var(--muted)', lineHeight: 1.5 } }, 'Contact: [name] · [email] · [phone]'),
+        h('span', { style: { background: 'var(--accent)', color: '#ffffff', padding: f(8, 1.6) + ' ' + f(16, 2.8), borderRadius: 10, fontWeight: 600, fontSize: f(12, 1.7) } }, 'Start the pilot'))
+    )
+  );
+}
+
+function SIntro(n) {
+  const role = (icon, title, text) => h('div', { className: 'card', style: { display: 'grid', gridTemplateColumns: 'auto 1fr', gap: f(12, 1.6), alignItems: 'center', padding: 'max(8px, 1.6cqi)' } },
+    h(Icon, { name: icon, size: 26, color: 'var(--accent)' }),
+    h('div', { style: { display: 'grid', gap: f(4, .6), minWidth: 0 } },
+      h('strong', { style: { fontSize: f(13, 1.9), color: 'var(--text)' } }, title),
+      h('span', { style: { fontSize: f(12, 1.7), color: 'var(--muted)' } }, text)));
+  return Slide(n, Head('Introduction', 'A native order system for artisanal gift boxes', 'Built inside monday.com for the designers who take orders and the people who produce them.'),
+    h('div', { className: 'split' },
+      Points([
+        ['What it does:', 'takes exact orders, enforces the 3-scent rule and writes each item to the board.'],
+        ['Who uses it:', 'Candle Designers take the order; Production Managers follow it to delivery.'],
+        ['Why it fits:', 'it runs inside monday.com, so nothing extra to install or host.']
+      ]),
+      h('div', { style: { display: 'grid', gap: f(6, 1) } },
+        role('users', 'Candle Designers', 'Take the client order and pick three scents per box.'),
+        role('layout-dashboard', 'The Order Maker board', 'Checks each order and writes it to the board.'),
+        role('flame', 'Production Managers', 'See each order move from request to done.'))
+    )
+  );
+}
+
+const SLIDES = [
+  { id: 's1', render: S1, notes: 'Open with the client’s problem: a custom gift box that has to be exactly right. Frame the app as bringing that craft into one system that moves at business speed.' },
+  { id: 's2', render: SIntro, notes: 'Say who the app is for: the designer who takes the order and the production manager who makes it. Keep it to one minute.' },
+  { id: 's3', render: S2, notes: 'Walk through the paper-to-spreadsheet path. Ask how many orders a month are retyped or corrected.' },
+  { id: 's4', render: S3, notes: 'These rules are why generic tools break. The app encodes them, rather than working around them.' },
+  { id: 's5', render: S4, notes: 'Point to the single board. Everything after this slide lives in the same place.' },
+  { id: 's6', render: S5, notes: 'Demo moment: choose three scents, show the locked menu, then submit. Note the live counter.' },
+  { id: 's7', render: S9, notes: 'Only the test count and the zero-retyping point are proven today. The cycle-time reduction is the pilot’s job: agree the baseline with the client.' },
+  { id: 's8', render: S6, notes: 'For IT and security: no external cloud, identity checked on every request, and the rules enforced on the server.' },
+  { id: 's9', render: S8, notes: 'The bars and counts here are sample data. The status chart is live on the board today; the other widgets are configured during the pilot.' },
+  { id: 's10', render: S10, notes: 'Close on the pilot. Confirm dates, who owns the fragrance catalogue on the client side, and the contact details.' }
+];
+
+function fullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+}
+
+function Btn(icon, label, onClick, hideLabel) {
+  return h('button', { className: 'btn', onClick, 'aria-label': label, title: label },
+    h(Icon, { name: icon, size: 18 }),
+    h('span', { className: hideLabel ? 'lbl' : '' }, label));
+}
+
+function App() {
+  const [i, setI] = useState(0);
+  const [notes, setNotes] = useState(false);
+  const n = SLIDES.length;
+  const go = (d) => setI((x) => Math.min(n - 1, Math.max(0, x + d)));
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+      else if (e.key === 'n' || e.key === 'N') setNotes((v) => !v);
+      else if (e.key === 'f' || e.key === 'F') fullscreen();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const slide = SLIDES[i];
+  return h('div', { style: { display: 'grid', gap: 14, width: '100%', maxWidth: 1100, margin: '0 auto' } },
+    h('div', { className: 'stage' }, slide.render(i + 1)),
+    h('div', { style: { height: 4, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' } },
+      h('div', { style: { height: '100%', width: ((i + 1) / n * 100) + '%', background: 'var(--accent)', transition: 'width .3s' } })),
+    h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' } },
+      h('div', { style: { display: 'flex', gap: 8 } },
+        Btn('chevron-left', 'Back', () => go(-1), true),
+        Btn('chevron-right', 'Next', () => go(1), true)),
+      h('div', { style: { display: 'flex', gap: 6, alignItems: 'center' } },
+        ...SLIDES.map((s, k) => h('button', { key: s.id, className: 'dot', 'aria-label': 'Go to slide ' + (k + 1), 'aria-current': k === i ? 'true' : 'false', onClick: () => setI(k) }))),
+      h('div', { style: { display: 'flex', gap: 8 } },
+        Btn('notebook-pen', 'Show notes (N)', () => setNotes((v) => !v), true),
+        Btn('maximize', 'Go full screen (F)', fullscreen, true))),
+    notes ? h('div', { className: 'card', style: { fontSize: 14, lineHeight: 1.6, color: 'var(--muted)' } },
+      h('strong', { style: { color: 'var(--accent)' } }, 'Speaker notes, slide ' + (i + 1) + '. '), slide.notes) : null
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
